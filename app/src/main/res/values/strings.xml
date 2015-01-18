@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">My Application</string>
-    <string name="title_activity_main">Hello World Immersion</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">ScandIn</string>
+    <string name="title_activity_main">ScandIn</string>
+    <string name="instructions">Would you like to find out more about the person you are looking at? Tap the touchpad to continue.</string>
 
 </resources>

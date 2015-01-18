@@ -19,16 +19,8 @@ import com.google.android.glass.widget.CardBuilder;
 import com.google.android.glass.widget.CardScrollAdapter;
 import com.google.android.glass.widget.CardScrollView;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.loopj.android.http.*;
 
@@ -116,13 +108,20 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
+    private View buildThirdView() {
+        CardBuilder card = new CardBuilder(this, CardBuilder.Layout.TEXT);
+
+        card.setText("test\ntext");
+        return card.getView();
+    }
+
     /**
      * Builds a Glass styled "Hello World!" view using the {@link CardBuilder} class.
      */
     private View buildView() {
         CardBuilder card = new CardBuilder(this, CardBuilder.Layout.TEXT);
 
-        card.setText(R.string.hello_world);
+        card.setText(R.string.instructions);
         return card.getView();
     }
     private static final int TAKE_PICTURE_REQUEST = 1;
@@ -152,31 +151,32 @@ public class MainActivity extends Activity {
     }
 
     public void downloadTask(final File image) {
-        System.out.println("download task");
-
         AsyncHttpClient client = new AsyncHttpClient();
-        client.post("http://104.131.57.6:3000/api/glass", new AsyncHttpResponseHandler() {
+        File input = image;
+        Bitmap bm = BitmapFactory.decodeFile(picturePath);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 25, baos); //bm is the bitmap object
+        byte[] b = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
 
+        RequestParams params = new RequestParams();
+        params.put("image", encodedImage);
+
+        client.post("http://104.131.57.6:3000/api/glass", params, new AsyncHttpResponseHandler() {
             @Override
             public void onStart() {
                 // called before request is started
-                File input = image;
-                Bitmap bm = BitmapFactory.decodeFile(picturePath);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
-                byte[] b = baos.toByteArray();
-                String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
-                System.out.println(encodedImage);
-
-                RequestParams params = new RequestParams();
-                params.put("image", encodedImage);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 // called when response HTTP status is "200 OK"
                 System.out.println("Success");
+                // parse data and build view
+                mView = buildThirdView();
+                setContentView(mView);
             }
+
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
