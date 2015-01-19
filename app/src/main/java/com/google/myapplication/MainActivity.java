@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.FileObserver;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -108,13 +109,6 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
-    private View buildThirdView() {
-        CardBuilder card = new CardBuilder(this, CardBuilder.Layout.TEXT);
-
-        card.setText("test\ntext");
-        return card.getView();
-    }
-
     /**
      * Builds a Glass styled "Hello World!" view using the {@link CardBuilder} class.
      */
@@ -129,6 +123,13 @@ public class MainActivity extends Activity {
     private void takePicture() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, TAKE_PICTURE_REQUEST);
+    }
+
+    private View buildThirdView(String textToDisplay) {
+        CardBuilder card = new CardBuilder(this, CardBuilder.Layout.TEXT);
+
+        card.setText(textToDisplay);
+        return card.getView();
     }
 
     @Override
@@ -172,8 +173,12 @@ public class MainActivity extends Activity {
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 // called when response HTTP status is "200 OK"
                 System.out.println("Success");
+
+                String s = new String(response);
+                System.out.println("Text Decryted : " + s);
+                Log.d("BODY", s);
                 // parse data and build view
-                mView = buildThirdView();
+                mView = buildThirdView(s);
                 setContentView(mView);
             }
 
